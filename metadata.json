@@ -1,0 +1,7 @@
+{
+  "name": "JFDI",
+  "description": "An ADHD-friendly brain dump and productivity app that uses AI to organize thoughts, track accomplishments, and provide gentle nudges.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
