@@ -1,9 +1,8 @@
-
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import { BrainItem, BrainItemType, UserPreferences } from "../types";
 
-// Always use const ai = new GoogleGenAI({apiKey: process.env.API_KEY});
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// FIXED: Using import.meta.env for Vite and the correct Key name
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 
 export const categorizeBrainDump = async (text: string, preferences?: UserPreferences): Promise<{
   title: string;
@@ -16,27 +15,31 @@ export const categorizeBrainDump = async (text: string, preferences?: UserPrefer
     ? `Personal user context to consider: "${preferences.aiContext}". Use this to better categorize and title the item.`
     : "";
 
-  const response = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
-    contents: `Analyze this brain dump: "${text}". ${contextInstruction} 
-    Categorize it as a 'task', 'idea', 'win', or 'note'. Provide a short clear title, a broad category (like Work, Personal, Creative, Health), and relevant tags. Also suggest a priority if it's a task.`,
-    config: {
+  // FIXED: Updated model name and initialization pattern
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-1.5-flash',
+    generationConfig: {
       responseMimeType: "application/json",
       responseSchema: {
-        type: Type.OBJECT,
+        type: SchemaType.OBJECT,
         properties: {
-          title: { type: Type.STRING },
-          type: { type: Type.STRING, enum: ['task', 'idea', 'win', 'note'] },
-          category: { type: Type.STRING },
-          tags: { type: Type.ARRAY, items: { type: Type.STRING } },
-          priority: { type: Type.STRING, enum: ['low', 'medium', 'high'] }
+          title: { type: SchemaType.STRING },
+          type: { type: SchemaType.STRING, enum: ['task', 'idea', 'win', 'note'] },
+          category: { type: SchemaType.STRING },
+          tags: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+          priority: { type: SchemaType.STRING, enum: ['low', 'medium', 'high'] }
         },
         required: ['title', 'type', 'category', 'tags', 'priority']
       }
     }
   });
 
-  return JSON.parse(response.text || '{}');
+  const prompt = `Analyze this brain dump: "${text}". ${contextInstruction} 
+    Categorize it as a 'task', 'idea', 'win', or 'note'. Provide a short clear title, a broad category (like Work, Personal, Creative, Health), and relevant tags. Also suggest a priority if it's a task.`;
+
+  const result = await model.generateContent(prompt);
+  const response = await result.response;
+  return JSON.parse(response.text());
 };
 
 export const generateGentleNudge = async (items: BrainItem[], preferences?: UserPreferences): Promise<string> => {
@@ -47,11 +50,12 @@ export const generateGentleNudge = async (items: BrainItem[], preferences?: User
     ? `The user's personal context is: "${preferences.aiContext}". Tailor the nudge to be relevant to their life/work.`
     : "";
 
-  const response = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
-    contents: `Based on these tasks: ${pendingTasks.map(t => t.title).join(', ')}, generate a "Gentle Nudge". ${contextInstruction} 
-    This should be a kind, ADHD-friendly reminder that reduces overwhelm and suggests one small, actionable step. Keep it under 25 words.`,
-  });
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  
+  const prompt = `Based on these tasks: ${pendingTasks.map(t => t.title).join(', ')}, generate a "Gentle Nudge". ${contextInstruction} 
+    This should be a kind, ADHD-friendly reminder that reduces overwhelm and suggests one small, actionable step. Keep it under 25 words.`;
 
-  return response.text || "Just checking in. Remember to breathe and take it one step at a time.";
+  const result = await model.generateContent(prompt);
+  const response = await result.response;
+  return response.text() || "Just checking in. Remember to breathe and take it one step at a time.";
 };
