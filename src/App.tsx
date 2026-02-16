@@ -1,12 +1,12 @@
-
 import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
-import { BrainItem, UserProfile, ColorPalette } from './types';
-import TasksPage from './pages/TasksPage';
-import LibraryPage from './pages/LibraryPage';
-import CapturePage from './pages/CapturePage';
-import WinsPage from './pages/WinsPage';
-import ProfilePage from './pages/ProfilePage';
+// Fixed: Added ../ to look outside of the 'src' folder
+import { BrainItem, UserProfile, ColorPalette } from '../types';
+import TasksPage from '../pages/TasksPage';
+import LibraryPage from '../pages/LibraryPage';
+import CapturePage from '../pages/CapturePage';
+import WinsPage from '../pages/WinsPage';
+import ProfilePage from '../pages/ProfilePage';
 
 const PALETTES: Record<ColorPalette, string> = {
   default: '#4A9099',
@@ -90,33 +90,4 @@ const Navigation: React.FC = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <nav className="fixed bottom-0 w-full max-w-[480px] bg-white border-t border-coastal-100 px-6 py-3 pb-8 z-50">
-      <div className="flex items-center justify-between">
-        <Link to="/tasks" className={`flex flex-col items-center gap-1 ${isActive('/tasks') ? 'text-primary' : 'text-coastal-600'}`}>
-          <span className={`material-symbols-outlined ${isActive('/tasks') ? 'active-icon' : ''}`}>task_alt</span>
-          <p className="text-[10px] font-bold uppercase tracking-tighter">Tasks</p>
-        </Link>
-        <Link to="/wins" className={`flex flex-col items-center gap-1 ${isActive('/wins') ? 'text-primary' : 'text-coastal-600'}`}>
-          <span className={`material-symbols-outlined ${isActive('/wins') ? 'active-icon' : ''}`}>analytics</span>
-          <p className="text-[10px] font-bold uppercase tracking-tighter">Wins</p>
-        </Link>
-        <Link to="/capture" className={`flex flex-col items-center gap-1 ${isActive('/capture') ? 'text-primary' : 'text-coastal-600'}`}>
-          <div className="bg-coastal-100 rounded-full p-2 -mt-10 shadow-md">
-            <span className="material-symbols-outlined text-coastal-800">add</span>
-          </div>
-          <p className="text-[10px] font-bold uppercase tracking-tighter mt-1">Capture</p>
-        </Link>
-        <Link to="/library" className={`flex flex-col items-center gap-1 ${isActive('/library') ? 'text-primary' : 'text-coastal-600'}`}>
-          <span className={`material-symbols-outlined ${isActive('/library') ? 'active-icon' : ''}`}>inventory_2</span>
-          <p className="text-[10px] font-bold uppercase tracking-tighter">Vault</p>
-        </Link>
-        <Link to="/profile" className={`flex flex-col items-center gap-1 ${isActive('/profile') ? 'text-primary' : 'text-coastal-600'}`}>
-          <span className={`material-symbols-outlined ${isActive('/profile') ? 'active-icon' : ''}`}>person</span>
-          <p className="text-[10px] font-bold uppercase tracking-tighter">Profile</p>
-        </Link>
-      </div>
-    </nav>
-  );
-};
-
-export default App;
+    <nav className="fixed bottom-0 w-full max-w-[480px] bg-white border-t border-coastal-100 px-6 py-3 pb-8 z-
