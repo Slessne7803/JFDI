@@ -1,8 +1,8 @@
-import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
+import { GoogleGenAI, Type as SchemaType } from "@google/genai";
 import { BrainItem, BrainItemType, UserPreferences } from "../types";
 
-// FIXED: Using import.meta.env for Vite and the correct Key name
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+// Using the key name you set in Vercel with the Vite requirement
+const genAI = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
 
 export const categorizeBrainDump = async (text: string, preferences?: UserPreferences): Promise<{
   title: string;
@@ -15,7 +15,6 @@ export const categorizeBrainDump = async (text: string, preferences?: UserPrefer
     ? `Personal user context to consider: "${preferences.aiContext}". Use this to better categorize and title the item.`
     : "";
 
-  // FIXED: Updated model name and initialization pattern
   const model = genAI.getGenerativeModel({
     model: 'gemini-1.5-flash',
     generationConfig: {
